@@ -1,58 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Loan List</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            padding: 0;
-        }
+{% extends 'basic_generic.html' %}
+{% block content %}
+{% load static %}
 
-        h2 {
-            color: #333;
-        }
-
-        ul {
-            list-style-type: none;
-            padding: 0;
-        }
-
-        li {
-            margin-bottom: 10px;
-        }
-
-        li a {
-            text-decoration: none;
-            color: #007BFF;
-            font-weight: bold;
-        }
-
-        li a:hover {
-            text-decoration: underline;
-        }
-
-        .no-loans {
-            color: #777;
-        }
-
-        p a {
-            text-decoration: none;
-            color: white;
-            background-color: #4CAF50;
-            padding: 10px 15px;
-            border-radius: 5px;
-        }
-
-        p a:hover {
-            background-color: #45a049;
-        }
-    </style>
-</head>
 <body>
     <h2>Your Loans</h2>
+    <p>Below is a list of all the loans you have applied for or lent out.</p>
     
     {% if loans %}
         <ul>
@@ -71,3 +23,5 @@
     <p><a href="{% url 'loans:loan_application' %}">Apply for another loan</a></p>
 </body>
 </html>
+
+{% endblock %}

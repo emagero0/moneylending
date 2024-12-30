@@ -1,51 +1,29 @@
+{% extends 'basic_generic.html' %}
+{% block content %}
 {% load static %}
-
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Money Lending Platform</title>
-    <link rel="stylesheet" href="{% static 'css/style.css' %}"> <!-- Include static CSS if applicable -->
-</head>
-<body>
-    <header>
-        <h1>Welcome to the Money Lending Platform</h1>
-        <nav>
-            <ul>
-                <li><a href="{% url 'loans:loan_application' %}">Apply for a Loan</a></li>
-                <li><a href="{% url 'loans:loan_list' %}">View Loan Applications</a></li>
-                <li><a href="{% url 'admin:index' %}">Admin Dashboard</a></li>
-            </ul>
-        </nav>
-    </header>
-
     <main>
         <section>
-            <h2>What We Offer</h2>
-            <p>Our platform provides a secure and efficient way to apply for loans, track applications, and manage approvals.</p>
+            <h2>Connect and Empower: Loans Made Simple</h2>
+            <p>Our platform connects borrowers and lenders directly, creating a transparent and efficient lending process. Whether you're looking to secure funding for your goals or seeking to invest in a reliable lending platform, we are here to help.</p>
         </section>
 
         <section>
-            <h2>Features</h2>
+            <h2>Key Features</h2>
             <ul>
-                <li>Quick and easy loan application process.</li>
-                <li>Comprehensive list of loans and their details.</li>
-                <li>Admin capabilities for loan approval.</li>
+                <li><strong>Simple Loan Application:</strong> Quick and easy loan application process for borrowers.</li>
+                <li><strong>Flexible Lending:</strong> Lenders can choose which loan applications to fund.</li>
+                <li><strong>Transparent Transactions:</strong> Track all transactions easily on our platform.</li>
+                <li><strong>User Reviews and Ratings:</strong> Make informed decisions through user reviews and ratings.</li>
             </ul>
         </section>
         <section>
-            <h2>Users</h2>
+             <h2>Community Members</h2>
             <ul>
                 {% for user in users %}
                     <li>
                       <a href="{% url 'loans:submit_review' user.id %}">
                         User: {{ user.username }} - Rating: {{ user.rating }}
                       </a>
-                      
-                        
-                       
                         <ul>
                             {% for review in user.reviews_received.all %}
                                <li>Review: {{ review.comment }} - Rating: {{ review.rating }}  - By: {{review.reviewer.username}} </li>
@@ -57,9 +35,4 @@
             </ul>
         </section>
     </main>
-
-    <footer>
-        <p>© 2024 Money Lending Platform. All rights reserved.</p>
-    </footer>
-</body>
-</html>
+{% endblock %}

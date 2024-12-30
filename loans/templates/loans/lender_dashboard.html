@@ -1,15 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lender Dashboard</title>
-</head>
+{% extends 'basic_generic.html' %}
+{% block content %}
+{% load static %}
+
 <body>
-    <h2>Lender Dashboard</h2>
-    <p>Welcome, Lender!</p>
+    <h2>Welcome to your Lender Dashboard</h2>
+    <p>View and manage your lending activity below.</p>
 
     <h3>Pending Loan Applications</h3>
+    <p>Review the list of loan applications waiting for approval. Click on a loan to see more details and make a decision.</p>
     <ul>
         {% for application in pending_applications %}
             <li>
@@ -18,11 +16,12 @@
                 </a>
             </li>
         {% empty %}
-            <li>No pending applications.</li>
+            <li>No pending applications at the moment.</li>
         {% endfor %}
     </ul>
 
-    <h3>Loans You've Lent</h3>
+    <h3>Your Lent Loans</h3>
+     <p>See all the loans that you have lent out, along with information on the loan amount, borrower, and current status.</p>
     <ul>
         {% for loan in lent_loans %}
             <li>
@@ -31,7 +30,7 @@
                 </a>
             </li>
         {% empty %}
-            <li>No loans lent yet.</li>
+            <li>You have not lent out any loans yet.</li>
         {% endfor %}
     </ul>
      <h3>Your Transactions</h3>
@@ -41,8 +40,10 @@
            Transaction ID: {{ transaction.id }} -  Amount: ${{ transaction.amount }} -  Date: {{ transaction.transaction_date }}  - Loan: {{transaction.loan}} - Repaid: {{transaction.is_repaid}}
         </li>
     {% empty %}
-            <li>No transaction made yet.</li>
+            <li>No transactions have been made yet.</li>
         {% endfor %}
     </ul>
 </body>
 </html>
+
+{% endblock %}

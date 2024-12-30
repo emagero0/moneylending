@@ -63,7 +63,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            BASE_DIR / "templates",  # Main templates directory
+            BASE_DIR / "moneylending_platform" / "templates",  # Main templates directory
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -127,8 +127,9 @@ USE_TZ = True
 
 STATIC_URL = '/static/'  # Include trailing slash for consistency
 STATICFILES_DIRS = [
-    r"C:\Users\emage\Documents\JKUAT\5.1\IAP\moneylending_platform\moneylending_platform\static"
+    os.path.join(BASE_DIR, "static")
 ]  # Add if you have static files in your project
+STATIC_ROOT =  os.path.join(BASE_DIR, "staticfiles")
 
 # Media files (for user-uploaded content like profile pictures)
 MEDIA_URL = '/media/'

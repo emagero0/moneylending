@@ -9,6 +9,7 @@ from django.contrib.auth.forms import AuthenticationForm
 
 
 # View for Loan Application
+# View for Loan Application
 def loan_application_view(request):
     if request.method == 'POST':
         form = LoanApplicationForm(request.POST)
@@ -16,12 +17,13 @@ def loan_application_view(request):
             loan_application = form.save(commit=False)
             loan_application.borrower = request.user  # Set the current logged-in user as the borrower
             loan_application.save()
-            return redirect('loan_application_success')  # Redirect to a success page
+            return render(request, 'loans/loan_application.html', {'form': form, 'message':'Loan application submitted succesfully!'})  # Redirect to a success page
     else:
         form = LoanApplicationForm()
     return render(request, 'loans/loan_application.html', {'form': form})
 
 
+# Business Logic for Loan Approval (with eligibility checks)
 # Business Logic for Loan Approval (with eligibility checks)
 @login_required
 def approve_loan_view(request, application_id):
@@ -55,7 +57,7 @@ def approve_loan_view(request, application_id):
             application.status = LoanStatus.APPROVED
             application.save()
 
-            return redirect('loan_detail', loan_id=loan.id)
+            return render(request, 'loans/approve_loan.html', {'form': form, 'application': application, 'message':'Loan status has been updated'})
     else:
         form = LoanForm()  # Render the loan form for approval
     return render(request, 'loans/approve_loan.html', {'form': form, 'application': application})
@@ -71,7 +73,7 @@ def transaction_view(request, loan_id):
                 transaction = form.save(commit=False)
                 transaction.loan = loan  # Attach the transaction to the loan
                 transaction.save()
-                return redirect('transaction_success')
+                return render(request, 'loans/transaction.html', {'form': form, 'loan': loan, 'message':'Transaction submitted successfully!'})
         else:
             form = TransactionForm()
         return render(request, 'loans/transaction.html', {'form': form, 'loan': loan})
@@ -95,6 +97,7 @@ def loan_detail(request, pk):
 
 
 # View for Review submission
+# View for Review submission
 def submit_review_view(request, user_id):
     user = get_object_or_404(User, id=user_id)
     if request.method == 'POST':
@@ -103,12 +106,13 @@ def submit_review_view(request, user_id):
             review = form.save(commit=False)
             review.reviewed_user = user
             review.save()  # Save the review
-            return redirect('loans:home')
+            return render(request, 'loans/submit_review.html', {'form': form, 'reviewed_user':user, 'message': 'Review submitted!'})
     else:
         form = ReviewForm(initial={'reviewer': request.user.id})  # Set the current user as reviewer
     return render(request, 'loans/submit_review.html', {'form': form, 'reviewed_user':user})
 
 
+# User Registration View
 # User Registration View
 def register_view(request):
     if request.method == 'POST':
@@ -124,7 +128,7 @@ def register_view(request):
             except Group.DoesNotExist:
                 return HttpResponse("Invalid role selected.", status=400)
             auth_login(request, user)  # Log the user in immediately after registration
-            return redirect('home')  # Redirect to the home page or dashboard
+            return render(request, 'registration/register.html', {'form': form, 'message':'Registration successful!'})
     else:
         form = UserRegistrationForm()
     return render(request, 'registration/register.html', {'form': form})
@@ -145,7 +149,7 @@ def edit_profile_view(request):
         form = EditProfileForm(request.POST, request.FILES, instance=request.user)
         if form.is_valid():
             form.save()
-            return redirect('loans:home')  # Redirect to the home page after editing
+            return render(request, 'loans/edit_profile.html', {'form': form, 'message':'Profile updated succesfully!'})  # Redirect to the home page after editing
     else:
         form = EditProfileForm(instance=request.user)
     return render(request, 'loans/edit_profile.html', {'form': form})
@@ -183,4 +187,6 @@ def borrower_dashboard(request):
 # Home View
 def home(request):
     users = User.objects.all()
-    return render(request, 'loans/home.html', {'users':users})
+    is_lender_user = is_lender(request.user)
+    is_borrower_user = is_borrower(request.user)
+    return render(request, 'loans/home.html', {'users':users, 'is_lender': is_lender_user, 'is_borrower': is_borrower_user})

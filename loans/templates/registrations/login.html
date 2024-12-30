@@ -1,5 +1,10 @@
-<form method="post">
+{% extends 'basic_generic.html' %}
+{% block content %}
+<h2>Login</h2>
+<p>Please login using your username and password.</p>
+<form method="post" onsubmit="return validateForm(this)">
     {% csrf_token %}
     {{ form.as_p }}
     <button type="submit">Login</button>
 </form>
+{% endblock %}

@@ -1,6 +1,10 @@
+{% extends 'basic_generic.html' %}
+{% block content %}
 <h2>Transaction for Loan</h2>
-<form method="POST">
+<p>Make a payment or repayment below.</p>
+<form method="POST" onsubmit="return validateForm(this)">
     {% csrf_token %}
     {{ form.as_p }}
     <button type="submit">Submit Transaction</button>
 </form>
+{% endblock %}
