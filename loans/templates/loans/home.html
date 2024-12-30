@@ -1,0 +1,44 @@
+{% load static %}
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Money Lending Platform</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}"> <!-- Include static CSS if applicable -->
+</head>
+<body>
+    <header>
+        <h1>Welcome to the Money Lending Platform</h1>
+        <nav>
+            <ul>
+                <li><a href="{% url 'loans:loan_application' %}">Apply for a Loan</a></li>
+                <li><a href="{% url 'loans:loan_list' %}">View Loan Applications</a></li>
+                <li><a href="{% url 'admin:index' %}">Admin Dashboard</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section>
+            <h2>What We Offer</h2>
+            <p>Our platform provides a secure and efficient way to apply for loans, track applications, and manage approvals.</p>
+        </section>
+
+        <section>
+            <h2>Features</h2>
+            <ul>
+                <li>Quick and easy loan application process.</li>
+                <li>Comprehensive list of loans and their details.</li>
+                <li>Admin capabilities for loan approval.</li>
+            </ul>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Money Lending Platform. All rights reserved.</p>
+    </footer>
+</body>
+</html>
