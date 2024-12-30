@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Borrower Dashboard</title>
+</head>
+<body>
+    <h2>Borrower Dashboard</h2>
+    <p>Welcome, Borrower!</p>
+
+    <h3>Your Loan Applications</h3>
+    <ul>
+        {% for application in loan_applications %}
+            <li>
+                <a href="{% url 'loans:loan_detail' application.id %}">
+                    Loan ID: {{ application.id }} - Amount: ${{ application.amount_requested }} - Status: {{ application.status }}
+                </a>
+            </li>
+        {% empty %}
+            <li>No loan applications yet.</li>
+        {% endfor %}
+    </ul>
+
+    <h3>Your Borrowed Loans</h3>
+    <ul>
+         {% for loan in borrowed_loans %}
+            <li>
+                 <a href="{% url 'loans:loan_detail' loan.id %}">
+                   Loan ID: {{ loan.id }} - Amount: ${{ loan.amount_requested }} - Status: {{ loan.status }}
+                 </a>
+            </li>
+        {% empty %}
+            <li>No loans borrowed yet.</li>
+        {% endfor %}
+    </ul>
+     <h3>Your Transactions</h3>
+    <ul>
+    {% for transaction in borrower_transactions %}
+        <li>
+           Transaction ID: {{ transaction.id }} -  Amount: ${{ transaction.amount }} -  Date: {{ transaction.transaction_date }}  - Loan: {{transaction.loan}} - Repaid: {{transaction.is_repaid}}
+        </li>
+    {% empty %}
+            <li>No transaction made yet.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

@@ -144,3 +144,4 @@ AUTH_USER_MODEL = 'loans.User'
 
 LOGIN_REDIRECT_URL = 'loans:home'
 LOGOUT_REDIRECT_URL = 'loans:home'
+LOGIN_URL = '/login/'

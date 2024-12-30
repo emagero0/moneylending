@@ -2,9 +2,11 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import Group
-from django.contrib.auth import login
-from .models import LoanApplication, Loan, Transaction, Review, LoanStatus
-from .forms import LoanApplicationForm, LoanForm, TransactionForm, ReviewForm, UserRegistrationForm
+from django.contrib.auth import login as auth_login, authenticate
+from .models import LoanApplication, Loan, Transaction, Review, LoanStatus, User # Import User
+from .forms import LoanApplicationForm, LoanForm, TransactionForm, ReviewForm, UserRegistrationForm, EditProfileForm, LoanStatusUpdateForm
+from django.contrib.auth.forms import AuthenticationForm
+
 
 # View for Loan Application
 def loan_application_view(request):
@@ -18,6 +20,7 @@ def loan_application_view(request):
     else:
         form = LoanApplicationForm()
     return render(request, 'loans/loan_application.html', {'form': form})
+
 
 # Business Logic for Loan Approval (with eligibility checks)
 @login_required
@@ -57,30 +60,54 @@ def approve_loan_view(request, application_id):
         form = LoanForm()  # Render the loan form for approval
     return render(request, 'loans/approve_loan.html', {'form': form, 'application': application})
 
+
 # View for Transaction (payment/repayment)
 def transaction_view(request, loan_id):
     loan = get_object_or_404(Loan, id=loan_id)
+    try:
+        if request.method == 'POST':
+            form = TransactionForm(request.POST)
+            if form.is_valid():
+                transaction = form.save(commit=False)
+                transaction.loan = loan  # Attach the transaction to the loan
+                transaction.save()
+                return redirect('transaction_success')
+        else:
+            form = TransactionForm()
+        return render(request, 'loans/transaction.html', {'form': form, 'loan': loan})
+    except ValueError as ve:
+            return HttpResponse(f"Value Error : {ve}", status=400)
+
+    except Exception as e:
+            return HttpResponse(f"An error occurred: {e}", status=500)
+
+def loan_detail(request, pk):
+    loan = get_object_or_404(Loan, pk=pk)
     if request.method == 'POST':
-        form = TransactionForm(request.POST)
+        form = LoanStatusUpdateForm(request.POST)
         if form.is_valid():
-            transaction = form.save(commit=False)
-            transaction.loan = loan  # Attach the transaction to the loan
-            transaction.save()
-            return redirect('transaction_success')
+            loan.status = form.cleaned_data['status']
+            loan.save()
+            return redirect('loans:loan_detail', pk=pk)
     else:
-        form = TransactionForm()
-    return render(request, 'loans/transaction.html', {'form': form, 'loan': loan})
+        form = LoanStatusUpdateForm(initial={'status':loan.status})
+    return render(request, 'loans/loan_detail.html', {'loan': loan, 'form':form})
+
 
 # View for Review submission
 def submit_review_view(request, user_id):
+    user = get_object_or_404(User, id=user_id)
     if request.method == 'POST':
         form = ReviewForm(request.POST)
         if form.is_valid():
-            form.save()  # Save the review
-            return redirect('review_success')
+            review = form.save(commit=False)
+            review.reviewed_user = user
+            review.save()  # Save the review
+            return redirect('loans:home')
     else:
         form = ReviewForm(initial={'reviewer': request.user.id})  # Set the current user as reviewer
-    return render(request, 'loans/submit_review.html', {'form': form})
+    return render(request, 'loans/submit_review.html', {'form': form, 'reviewed_user':user})
+
 
 # User Registration View
 def register_view(request):
@@ -96,31 +123,64 @@ def register_view(request):
                 user.groups.add(group)
             except Group.DoesNotExist:
                 return HttpResponse("Invalid role selected.", status=400)
-            login(request, user)  # Log the user in immediately after registration
+            auth_login(request, user)  # Log the user in immediately after registration
             return redirect('home')  # Redirect to the home page or dashboard
     else:
         form = UserRegistrationForm()
     return render(request, 'registration/register.html', {'form': form})
+def login_view(request):
+    if request.method == 'POST':
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            user = form.get_user()
+            auth_login(request, user)
+            return redirect('home')  # Redirect to home after login
+    else:
+         form = AuthenticationForm()
+    return render(request, 'loans/registrations/login.html', {'form': form})
+
+@login_required
+def edit_profile_view(request):
+    if request.method == 'POST':
+        form = EditProfileForm(request.POST, request.FILES, instance=request.user)
+        if form.is_valid():
+            form.save()
+            return redirect('loans:home')  # Redirect to the home page after editing
+    else:
+        form = EditProfileForm(instance=request.user)
+    return render(request, 'loans/edit_profile.html', {'form': form})
+
 
 # Role Checks
 def is_lender(user):
     return user.groups.filter(name='Lender').exists()
 
+
 def is_borrower(user):
     return user.groups.filter(name='Borrower').exists()
+
 
 @login_required
 @user_passes_test(is_lender)
 def lender_dashboard(request):
     # Logic for lender dashboard
-    return render(request, 'loans/lender_dashboard.html')
+    pending_applications = LoanApplication.objects.filter(status=LoanStatus.PENDING)
+    lent_loans = Loan.objects.filter(lender=request.user)
+    lender_transactions = Transaction.objects.filter(lender=request.user)
+    return render(request, 'loans/lender_dashboard.html', {'pending_applications': pending_applications, 'lent_loans': lent_loans, 'lender_transactions':lender_transactions})
+
 
 @login_required
 @user_passes_test(is_borrower)
 def borrower_dashboard(request):
     # Logic for borrower dashboard
-    return render(request, 'loans/borrower_dashboard.html')
+    loan_applications = LoanApplication.objects.filter(borrower=request.user)
+    borrowed_loans = Loan.objects.filter(borrower=request.user)
+    borrower_transactions = Transaction.objects.filter(borrower=request.user)
+    return render(request, 'loans/borrower_dashboard.html', {'loan_applications': loan_applications, 'borrowed_loans': borrowed_loans, 'borrower_transactions': borrower_transactions})
+
 
 # Home View
 def home(request):
-    return render(request, 'loans/home.html')
+    users = User.objects.all()
+    return render(request, 'loans/home.html', {'users':users})

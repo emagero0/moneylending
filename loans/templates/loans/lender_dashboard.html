@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lender Dashboard</title>
+</head>
+<body>
+    <h2>Lender Dashboard</h2>
+    <p>Welcome, Lender!</p>
+
+    <h3>Pending Loan Applications</h3>
+    <ul>
+        {% for application in pending_applications %}
+            <li>
+                <a href="{% url 'loans:approve_loan' application.id %}">
+                    Loan ID: {{ application.id }} - Amount: ${{ application.amount_requested }} - Borrower: {{ application.borrower.username }}
+                </a>
+            </li>
+        {% empty %}
+            <li>No pending applications.</li>
+        {% endfor %}
+    </ul>
+
+    <h3>Loans You've Lent</h3>
+    <ul>
+        {% for loan in lent_loans %}
+            <li>
+                <a href="{% url 'loans:loan_detail' loan.id %}">
+                   Loan ID: {{ loan.id }} - Amount: ${{ loan.amount_requested }} - Borrower: {{ loan.borrower.username }} - Status: {{ loan.status }}
+                </a>
+            </li>
+        {% empty %}
+            <li>No loans lent yet.</li>
+        {% endfor %}
+    </ul>
+     <h3>Your Transactions</h3>
+    <ul>
+    {% for transaction in lender_transactions %}
+        <li>
+           Transaction ID: {{ transaction.id }} -  Amount: ${{ transaction.amount }} -  Date: {{ transaction.transaction_date }}  - Loan: {{transaction.loan}} - Repaid: {{transaction.is_repaid}}
+        </li>
+    {% empty %}
+            <li>No transaction made yet.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

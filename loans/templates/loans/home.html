@@ -35,10 +35,31 @@
                 <li>Admin capabilities for loan approval.</li>
             </ul>
         </section>
+        <section>
+            <h2>Users</h2>
+            <ul>
+                {% for user in users %}
+                    <li>
+                      <a href="{% url 'loans:submit_review' user.id %}">
+                        User: {{ user.username }} - Rating: {{ user.rating }}
+                      </a>
+                      
+                        
+                       
+                        <ul>
+                            {% for review in user.reviews_received.all %}
+                               <li>Review: {{ review.comment }} - Rating: {{ review.rating }}  - By: {{review.reviewer.username}} </li>
+                            {% endfor %}
+                         </ul>
+                    
+                     </li>
+                {% endfor %}
+            </ul>
+        </section>
     </main>
 
     <footer>
-        <p>&copy; 2024 Money Lending Platform. All rights reserved.</p>
+        <p>© 2024 Money Lending Platform. All rights reserved.</p>
     </footer>
 </body>
 </html>

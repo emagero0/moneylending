@@ -133,4 +133,3 @@ class Review(models.Model):
 
     def __str__(self):
         return f"Review: {self.rating} for {self.reviewed_user.username}"
-

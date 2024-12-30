@@ -53,6 +53,14 @@
     {% if loan.collateral %}
         <p><span>Collateral:</span> {{ loan.collateral }}</p>
     {% endif %}
+    
+    {% if request.user.is_staff or request.user == loan.lender %}
+    <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Update Status</button>
+        </form>
+    {% endif %}
     <p><a href="{% url 'loans:loan_list' %}">Back to Loan List</a></p>
 </body>
 </html>

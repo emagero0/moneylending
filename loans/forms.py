@@ -1,8 +1,6 @@
-# loans/forms.py
-
 from django import forms
-from .models import LoanApplication, Loan, Transaction, Review
-from django.contrib.auth.models import User, Group
+from .models import LoanApplication, Loan, Transaction, Review, User, LoanStatus
+from django.contrib.auth.models import Group
 
 # Form for LoanApplication
 class LoanApplicationForm(forms.ModelForm):
@@ -95,3 +93,18 @@ class UserRegistrationForm(forms.ModelForm):
         if password != password_confirmation:
             raise forms.ValidationError("Passwords do not match.")
         return password_confirmation
+
+
+# Form for Editing User Profile
+class EditProfileForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['profile_picture', 'phone_number']
+        widgets = {
+            'profile_picture': forms.FileInput(attrs={'class': 'form-control'}),
+            'phone_number': forms.TextInput(attrs={'class': 'form-control'}),
+        }
+
+#Form for updating loan status
+class LoanStatusUpdateForm(forms.Form):
+    status = forms.ChoiceField(choices=LoanStatus.choices, widget=forms.Select(attrs={'class':'form-control'}))
